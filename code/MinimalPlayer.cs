@@ -53,5 +53,12 @@ namespace MinimalExample
 				ragdoll.PhysicsGroup.Velocity = EyeRot.Forward * 1000;
 			}
 		}
+
+		public override void OnKilled()
+		{
+			base.OnKilled();
+
+			EnableDrawing = false;
+		}
 	}
 }
