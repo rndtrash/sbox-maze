@@ -16,8 +16,6 @@ namespace MinimalExample
 			if ( IsClient )
 			{
 				RootPanel.SetTemplate( "/minimalhud.html" );
-
-				RootPanel.AddChild<ChatBox>();
 			}
 		}
 	}
