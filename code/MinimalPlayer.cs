@@ -41,6 +41,12 @@ namespace MinimalExample
 			base.Simulate( cl );
 
 			//
+			// If you have active children (like a weapon etc) you should call this to 
+			// simulate those too.
+			//
+			SimulateActiveChild( cl, ActiveChild );
+
+			//
 			// If we're running serverside and Attack1 was just pressed, spawn a ragdoll
 			//
 			if ( IsServer && Input.Pressed( InputButton.Attack1 ) )
