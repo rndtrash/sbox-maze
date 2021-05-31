@@ -1,3 +1,5 @@
-
-minimal/code/minimal.csproj
-minimal/code/accesslist.txt
+code/*.csproj
+code/obj
+code/Properties/launchSettings.json
+.intermediate
+tools_asset_info.bin
