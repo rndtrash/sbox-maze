@@ -10,6 +10,6 @@
  
  # Editing
  
- Run GenerateProjects in addons to make the csproj. Open Addons.sln.
+ Run the game to generate the project and open s&box.sln.
  
  Editing the .cs, .html, .scss files should reflect their changes in game in realtime.
