@@ -1,0 +1,92 @@
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+HEADER
+{
+    CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
+    Description = "Maze wall height";
+}
+
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+FEATURES
+{
+    #include "common/features.hlsl"
+}
+
+MODES
+{
+    VrForward();
+
+    ToolsVis( S_MODE_TOOLS_VIS );
+    ToolsWireframe( "vr_tools_wireframe.vfx" );
+}
+
+//=========================================================================================================================
+COMMON
+{
+    //#define S_TRANSLUCENT 1
+	#define S_UNLIT 1
+    #define STENCIL_ALREADY_SET
+    #define DEPTH_STATE_ALREADY_SET
+    #define BLEND_MODE_ALREADY_SET
+    #define COLOR_WRITE_ALREADY_SET
+    #include "common/shared.hlsl"
+}
+
+//=========================================================================================================================
+
+struct VertexInput
+{
+    #include "common/vertexinput.hlsl"
+};
+
+//=========================================================================================================================
+
+struct PixelInput
+{
+    #include "common/pixelinput.hlsl"
+};
+
+//=========================================================================================================================
+
+VS
+{
+    #include "common/vertex.hlsl"
+	
+	float WallHeight< UiGroup("aMazeing"); UiType(Slider); Default(0); Range(0.0f, 1.0f); >;
+	FloatAttribute( WallHeight, true );
+    //VS_CommonProcessing_Post
+    // Main
+    //
+    PixelInput MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
+    {
+		i.vPositionOs.z *= WallHeight;
+        PixelInput o = ProcessVertex( i );
+        return FinalizeVertex( o );
+    }
+}
+
+//=========================================================================================================================
+
+PS
+{
+    #include "common/pixel.hlsl"
+
+    RenderState( BlendEnable, true );
+    RenderState( SrcBlend, SRC_ALPHA );
+    RenderState( DstBlend, INV_SRC_ALPHA );
+    RenderState( ColorWriteEnable0, RGBA );
+
+    PixelOutput MainPs( PixelInput i )
+    {
+        Material m = GatherMaterial( i );
+        PixelOutput o = FinalizePixelMaterial( i, m );
+
+		if (o.vColor.a < 1.0)
+			discard;
+		
+        return o;
+    }
+}

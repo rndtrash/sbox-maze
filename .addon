@@ -1,4 +1,5 @@
 {
+	"ident": "tesa.maze",
     "sharedassets": "*.*",
     "type": "game"
 }
