@@ -4,7 +4,7 @@ namespace Maze
 {
 	public partial class Level : BaseNetworkable
 	{
-		public uint Width => 16;
+		public int Width => 16;
 		public WallEntity Walls { get; internal set; }
 
 		public Level()

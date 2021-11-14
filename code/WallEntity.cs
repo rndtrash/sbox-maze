@@ -6,7 +6,7 @@ namespace Maze
 	public partial class WallEntity : RenderEntity
 	{
 		Material wallMaterial = Material.Load( "materials/wall.vmat" );
-		Material speciaWallMaterial = Material.Load( "materials/ceiling.vmat" );
+		Material speciaWallMaterial = Material.Load( "materials/directx.vmat" );
 		VertexBuffer wallVB;
 		VertexBuffer specialWallVB;
 
@@ -46,6 +46,35 @@ namespace Maze
 			}
 		}
 
+		protected void AddWall( int cellX, int cellY, uint flags )
+		{
+			if ( flags == 0 )
+				return;
+
+			int worldX = cellX * 128;
+			int worldY = cellY * 128;
+
+			if ( (flags | Side.North) > 0 )
+			{
+				wallVB.AddQuad( new Vector3( worldX - 128, worldY, 128 ), new( worldX, worldY, 128 ), new( worldX, worldY, 0 ), new( worldX - 128, worldY, 0 ) );
+			}
+
+			if ( (flags | Side.East) > 0 )
+			{
+				wallVB.AddQuad( new Vector3( worldX - 128, worldY + 128, 128 ), new( worldX - 128, worldY, 128 ), new( worldX - 128, worldY, 0 ), new( worldX - 128, worldY + 128, 0 ) );
+			}
+
+			if ( (flags | Side.South) > 0 )
+			{
+				wallVB.AddQuad( new Vector3( worldX, worldY + 128, 128 ), new( worldX - 128, worldY + 128, 128 ), new( worldX - 128, worldY + 128, 0 ), new( worldX, worldY + 128, 0 ) );
+			}
+
+			if ( (flags | Side.West) > 0 )
+			{
+				wallVB.AddQuad( new Vector3( worldX, worldY, 128 ), new( worldX, worldY + 128, 128 ), new( worldX, worldY + 128, 0 ), new( worldX, worldY, 0 ) );
+			}
+		}
+
 		public override void Spawn()
 		{
 			Host.AssertClient();
@@ -53,15 +82,15 @@ namespace Maze
 			base.Spawn();
 
 			RenderBounds = new BBox( new Vector3( -12800, -12800, 0 ), new Vector3( 12800, 12800, 128 ) );
-			
+
 			// implying that the walls are created as soon as the level was made
 			wallVB = new();
 			wallVB.Init( true );
-			wallVB.AddQuad( new Vector3(128, 0, 0), new( 128, 0, 128 ), new( 128, 128, 128 ), new( 128, 128, 0 ) );
+
+			AddWall( 0, 0, Side.North | Side.East | Side.South | Side.West );
 
 			specialWallVB = new();
 			specialWallVB.Init( true );
-			specialWallVB.AddQuad( new Vector3( 0, 0, 128 ), new( Game.Current.Level.Width * 128, 0, 128 ), new( Game.Current.Level.Width * 128, Game.Current.Level.Width * 128, 128 ), new( 0, Game.Current.Level.Width * 128, 128 ) );
 
 			ready = true;
 			OnStateChange( Game.Current.State );
@@ -93,10 +122,10 @@ namespace Maze
 
 			Render.Set( "wallheight", wallHeight );
 
-			Render.CullMode = CullMode.Backface;
+			//Render.CullMode = CullMode.Backface;
 			wallVB.Draw( wallMaterial );
 
-			Render.CullMode = CullMode.FrontFace;
+			//Render.CullMode = CullMode.FrontFace;
 			specialWallVB.Draw( speciaWallMaterial );
 		}
 	}

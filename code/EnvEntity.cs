@@ -20,7 +20,7 @@ namespace Maze
 
 			base.Spawn();
 
-			RenderBounds = new BBox( new Vector3( -1, -1, 0 ), new Vector3( 12800, 12800, 128 ) );
+			RenderBounds = new BBox( new Vector3( -12800, -12800, 128 ), new Vector3( -128, -128, 0 ) );
 		}
 
 		[Event( "maze.level" )]
@@ -28,11 +28,11 @@ namespace Maze
 		{
 			floorVB = new();
 			floorVB.Init( true );
-			floorVB.AddQuad( Vector3.Zero, new( Game.Current.Level.Width * 128, 0 ), new( Game.Current.Level.Width * 128, Game.Current.Level.Width * 128 ), new( 0, Game.Current.Level.Width * 128 ) );
+			floorVB.AddQuad( Vector3.Zero, new( Game.Current.Level.Width * -128, 0 ), new( Game.Current.Level.Width * -128, Game.Current.Level.Width * 128 ), new( 0, Game.Current.Level.Width * 128 ) );
 
 			ceilingVB = new();
 			ceilingVB.Init( true );
-			ceilingVB.AddQuad( new Vector3( 0, 0, 128 ), new( Game.Current.Level.Width * 128, 0, 128 ), new( Game.Current.Level.Width * 128, Game.Current.Level.Width * 128, 128 ), new( 0, Game.Current.Level.Width * 128, 128 ) );
+			ceilingVB.AddQuad( new Vector3( 0, 0, 128 ), new( Game.Current.Level.Width * -128, 0, 128 ), new( Game.Current.Level.Width * -128, Game.Current.Level.Width * 128, 128 ), new( 0, Game.Current.Level.Width * 128, 128 ) );
 		}
 
 		public override void DoRender( SceneObject obj )
@@ -44,10 +44,10 @@ namespace Maze
 
 			Render.Set( "mazewidth", Game.Current.Level.Width );
 
-			Render.CullMode = CullMode.Backface;
+			Render.CullMode = CullMode.FrontFace;
 			floorVB.Draw( floorMaterial );
 
-			Render.CullMode = CullMode.FrontFace;
+			Render.CullMode = CullMode.Backface;
 			ceilingVB.Draw( ceilingMaterial );
 		}
 	}

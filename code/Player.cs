@@ -53,8 +53,8 @@ namespace Maze
 			var controller = GetActiveController();
 			controller?.Simulate( cl, this, null );
 
-			EyePos = EyePos.WithX( MathF.Sin( Time.Now / 2 * MathF.PI ) * 64 ).WithY( MathF.Cos( Time.Now / 2 * MathF.PI ) * 64 );
-			EyeRot = Rotation.FromYaw(EyeRot.Yaw() + 30 * Time.Delta );
+			//EyePos = EyePos.WithX( MathF.Sin( Time.Now / 2 * MathF.PI ) * 64 ).WithY( MathF.Cos( Time.Now / 2 * MathF.PI ) * 64 );
+			//EyeRot = Rotation.FromYaw(EyeRot.Yaw() + 30 * Time.Delta );
 		}
 
 		public override void FrameSimulate( Client cl )
@@ -81,7 +81,7 @@ namespace Maze
 			Transform = Transform.Zero;
 			Position = new Vector3(64, 64, 64);
 
-			Controller = null; //new NoclipController();
+			Controller = new NoclipController();
 
 			Camera = new FirstPersonCamera();
 
