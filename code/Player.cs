@@ -1,5 +1,4 @@
 ﻿using Sandbox;
-using System;
 using System.Threading.Tasks;
 
 namespace Maze
@@ -27,15 +26,15 @@ namespace Maze
 		public PawnController DevController { get; set; }
 
 		[AdminCmd( "maze_forceflip" )]
-		public async static void ForceFlip()
+		public static async void ForceFlip()
 		{
 			Log.Info( "alright" );
-			await (Local.Pawn as Player).Flip();
+			await (Local.Pawn as Player)?.Flip();
 		}
 
 		public async Task Flip()
 		{
-			//StopMovement = true;
+			StopMovement = true;
 			TargetRoll = 180.0f;
 			await Task.Delay( 1000 );
 			StopMovement = false;
@@ -67,7 +66,6 @@ namespace Maze
 
 		public override void OnKilled()
 		{
-			return;
 		}
 
 		public virtual void Respawn()
@@ -79,7 +77,9 @@ namespace Maze
 			ResetInterpolation();
 
 			Transform = Transform.Zero;
-			Position = new Vector3(64, 64, 64);
+			Position = new Vector3( Game.Current.Level.CellToWorld( 0, 0 ) ) + new Vector3( -64, 64, 64 ); // TODO: random position
+			EyeRot = Rotation.From( new Angles( 0, 0, 0 ) );
+			Log.Info( $"Player pos {Position}" );
 
 			Controller = new NoclipController();
 
@@ -117,10 +117,7 @@ namespace Maze
 		{
 			Host.AssertClient();
 
-			if ( ActiveChild != null )
-			{
-				ActiveChild.PostCameraSetup( ref setup );
-			}
+			ActiveChild?.PostCameraSetup( ref setup );
 		}
 
 		public override void StartTouch( Entity other )
@@ -130,7 +127,6 @@ namespace Maze
 			if ( other is PickupTrigger )
 			{
 				StartTouch( other.Parent );
-				return;
 			}
 		}
 	}

@@ -20,7 +20,7 @@ namespace Maze
 
 			base.Spawn();
 
-			RenderBounds = new BBox( new Vector3( -12800, -12800, 128 ), new Vector3( -128, -128, 0 ) );
+			RenderBounds = new BBox( new Vector3( -12800, 0, 0 ), new Vector3( 0, 1, 12800 ) );
 		}
 
 		[Event( "maze.level" )]

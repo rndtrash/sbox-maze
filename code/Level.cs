@@ -7,14 +7,14 @@ namespace Maze
 		public int Width => 16;
 		public WallEntity Walls { get; internal set; }
 
-		public Level()
+		public void InitClient()
 		{
-			//
-		}
+			Log.Info( "level: before assert" );
+			Host.AssertClient();
+			Log.Info( "level: after assert" );
 
-		public void Init()
-		{
 			Walls = new();
+			_ = new BillboardEntity { Position = CellToWorld( 1, 1 ) + CellCenter }; // TEST
 		}
 	}
 }

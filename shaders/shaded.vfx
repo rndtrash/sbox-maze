@@ -60,7 +60,6 @@ VS
     PixelInput MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
     {
         PixelInput o = ProcessVertex( i );
-		//o.vPositionPs.xy = floor(o.vPositionPs.xy * g_vRenderTargetSize.xy) / g_vRenderTargetSize.xy;
         return FinalizeVertex( o );
     }
 }

@@ -1,5 +1,5 @@
-﻿
-using Sandbox;
+﻿using Sandbox;
+using System;
 
 namespace Maze
 {
@@ -15,8 +15,11 @@ namespace Maze
 		public float IntroDelay => 3.5f;
 
 		public static Game Current { get; protected set; }
-		[Net, Change] public Level Level { get; internal set; }
-		[Net, Change] public GameState State { get; internal set; }
+		[Net, Change] public Level Level { get; protected set; }
+		[Net, Change] public GameState State { get; protected set; }
+		[Net] public float WallHeight { get; protected set; }
+		[Net] public float WallTargetHeight { get; protected set; }
+		protected TimeSince TimeSinceReset { get; set; }
 
 		public Game()
 		{
@@ -27,7 +30,6 @@ namespace Maze
 			if ( IsServer )
 			{
 				Level = new();
-				Log.Info( $"{Level == null}" );
 			}
 			else
 			{
@@ -39,24 +41,58 @@ namespace Maze
 		{
 			Host.AssertClient();
 
-			Level.Init();
-			Sound.FromScreen( "intro" );
+			Level.InitClient();
 
 			Event.Run( "maze.level" );
+		}
+
+		protected void ChangeState( GameState newState )
+		{
+			Host.AssertServer( nameof( ChangeState ) );
+
+			Log.Info( $"New server state: {newState}" );
+
+			switch ( newState )
+			{
+				case GameState.Intro:
+					TimeSinceReset = 0;
+					WallHeight = 0;
+					WallTargetHeight = 1;
+					break;
+				case GameState.InGame:
+					WallHeight = WallTargetHeight = 1;
+					break;
+				case GameState.Outro:
+					TimeSinceReset = 0;
+					WallHeight = 1;
+					WallTargetHeight = 0;
+					break;
+			}
+
+			State = newState;
 		}
 
 		public void OnStateChanged()
 		{
 			Host.AssertClient();
 
+			Log.Info( $"New client state: {State}" );
+
 			Event.Run( "maze.state", State );
+
+			switch ( State )
+			{
+				case GameState.Intro:
+					Sound.FromScreen( "intro" );
+					break;
+			}
 		}
 
 		public override void Spawn()
 		{
 			base.Spawn();
 
-			State = GameState.Intro;
+			ChangeState( GameState.Intro );
 		}
 
 		/// <summary>
@@ -64,12 +100,10 @@ namespace Maze
 		/// </summary>
 		public override void ClientJoined( Client client )
 		{
-			var player = new Maze.Player();
+			var player = new Player();
 			client.Pawn = player;
 
 			player.Respawn();
-
-			Log.Info( $"player {player.Position}" );
 		}
 
 		/// <summary>
@@ -92,6 +126,28 @@ namespace Maze
 				cl.Pawn = null;
 			}
 
+		}
+
+		protected void UpdateWallHeight()
+		{
+			if ( State == GameState.InGame )
+				return;
+
+			WallHeight = MathF.Abs( WallTargetHeight > 0 ? TimeSinceReset / IntroDelay : 1 - TimeSinceReset / IntroDelay );
+		}
+
+		[Event.Tick.Server]
+		public void Tick()
+		{
+			switch ( State )
+			{
+				case GameState.Intro:
+					UpdateWallHeight();
+					Log.Info( $"server tick {WallHeight}" );
+					if ( TimeSinceReset > IntroDelay )
+						ChangeState( GameState.InGame );
+					break;
+			}
 		}
 
 		/// <summary>
@@ -218,12 +274,10 @@ namespace Maze
 		/// </summary>
 		public override void PostLevelLoaded()
 		{
-			return;
 		}
 
 		public override void OnVoicePlayed( long playerId, float level )
 		{
-			return;
 		}
 	}
 

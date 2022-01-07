@@ -23,12 +23,12 @@ Layer0
 	//---- Material ----
 	g_flTintColor "[1.000000 1.000000 1.000000 0.000000]"
 	TextureAmbientOcclusion "materials/default/default_ao.tga"
-	TextureBlendMask "materials/default/default_blend.tga"
+	TextureBlendMask "[1.000000 1.000000 1.000000 0.000000]"
 	TextureColor "textures/wall.png"
 	TextureMetalness "materials/default/default_metal.tga"
 	TextureNormal "materials/default/default_normal.tga"
-	TextureRoughness "materials/default/default_rough.tga"
-	TextureTintMask "materials/default/default.tga"
+	TextureRoughness "[1.000000 1.000000 1.000000 0.000000]"
+	TextureTintMask "[1.000000 1.000000 1.000000 0.000000]"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"

@@ -4,7 +4,7 @@
 HEADER
 {
     CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
-    Description = "Low quality shit";
+    Description = "Lowest quality shit";
 }
 
 //=========================================================================================================================
@@ -26,7 +26,7 @@ MODES
 //=========================================================================================================================
 COMMON
 {
-    //#define S_TRANSLUCENT 1
+    #define S_TRANSLUCENT 1
 	#define S_UNLIT 1
     #define STENCIL_ALREADY_SET
     #define DEPTH_STATE_ALREADY_SET
@@ -60,7 +60,6 @@ VS
     PixelInput MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
     {
         PixelInput o = ProcessVertex( i );
-		//o.vPositionPs.xy = floor(o.vPositionPs.xy * g_vRenderTargetSize.xy) / g_vRenderTargetSize.xy;
         return FinalizeVertex( o );
     }
 }
@@ -69,6 +68,7 @@ VS
 
 PS
 {
+	#include "common.fxc"
     #include "common/pixel.hlsl"
 
     RenderState( BlendEnable, true );
@@ -76,13 +76,16 @@ PS
     RenderState( DstBlend, INV_SRC_ALPHA );
     RenderState( ColorWriteEnable0, RGBA );
 
+	CreateInputTexture2D( AlphaTexture, Linear, 8, "", "_alpha", "Color", Default3( 1.0, 1.0, 1.0 ) );
+	CreateTexture2D( g_tAlphaMask ) < Channel( R, Box( AlphaTexture ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	TextureAttribute( AlphaTexture, g_tAlphaMask );
+
     PixelOutput MainPs( PixelInput i )
     {
         Material m = GatherMaterial( i );
         PixelOutput o = FinalizePixelMaterial( i, m );
 
-		if (o.vColor.a < 1.0)
-			discard;
+		o.vColor.a = Tex2D( g_tAlphaMask, i.vTextureCoords.xy ).r;
 		
         return o;
     }
